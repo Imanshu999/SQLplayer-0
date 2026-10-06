@@ -1,0 +1,1 @@
+APK-only package. App name: androidApp/src/main/res/values/strings.xml. Icon: androidApp/src/main/res/mipmap-* or drawable-* resources. UI: Compose sources under composeApp/. The original core is a Git submodule at https://github.com/maxrave-dev/core (multiplatform branch) and must be restored for a complete build.
