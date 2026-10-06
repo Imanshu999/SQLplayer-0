@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.Color
  * Brand seed color. The whole Material 3 ColorScheme is generated from this
  * color at runtime — see [AppTheme].
  */
-val seed = Color(0xFF7C4DFF)
+val seed = Color(0xFFE53935)
 
 // ===== Semantic colors (not derivable from the color scheme) =====
 
