@@ -24,13 +24,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - name: Restore core
+          submodules: recursive
+      - name: Verify matching core submodule
         run: |
           set -euo pipefail
-          rm -rf core
-          git clone --depth 1 --branch main https://github.com/maxrave-dev/core.git core
           test -f core/common/build.gradle.kts
           test -f core/data/build.gradle.kts
+          git -C core rev-parse HEAD
       - name: Setup Java 21
         uses: actions/setup-java@v5
         with:
@@ -45,7 +45,7 @@ jobs:
             SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | sort -V | tail -1)"
           fi
           yes | "$SDKMANAGER" --licenses >/dev/null || true
-          "$SDKMANAGER" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+          "$SDKMANAGER" "platform-tools" "platforms;android-37" "build-tools;36.0.0"
       - name: Prepare
         run: |
           mkdir -p config
