@@ -11,7 +11,7 @@ jobs:
       - name: Restore core
         run: |
           if [ ! -f core/settings.gradle.kts ]; then rm -rf core; git clone --depth 1 --branch multiplatform https://github.com/maxrave-dev/core.git core; fi
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
