@@ -1,0 +1,2 @@
+# AboutLibraries configuration directory.
+# Kept in the repository because composeApp/build.gradle.kts points collect.configPath here.
