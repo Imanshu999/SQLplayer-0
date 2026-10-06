@@ -37,8 +37,8 @@ jobs:
             rm -rf core
             git clone --filter=blob:none https://github.com/maxrave-dev/core.git core
           fi
-          git -C core fetch --depth 1 origin 2cb77b8dc37d3dc9982a957304225ebc1d97bfdd
-          git -C core checkout --detach 2cb77b8dc37d3dc9982a957304225ebc1d97bfdd
+          # Agar aapko kisi specific commit ki jagah latest main branch chahiye toh yeh use karein:
+          git -C core checkout main || true
           test -f core/common/build.gradle.kts
           test -f core/data/build.gradle.kts
 
@@ -66,9 +66,9 @@ jobs:
           fi
           echo "Using: $SDKMANAGER"
           yes | "$SDKMANAGER" --licenses >/dev/null || true
-          "$SDKMANAGER"             "platform-tools"             "platforms;android-37"             "build-tools;36.0.0"
+          "$SDKMANAGER" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
-      - name: Build APK
+      - name: Build APK workflow
         shell: bash
         env:
           BUILD_TYPE: ${{ github.event.inputs.build_type || 'release' }}
