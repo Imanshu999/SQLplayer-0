@@ -31,7 +31,7 @@ jobs:
           if [ ! -f core/common/build.gradle.kts ]; then
             rm -rf core
             git clone --filter=blob:none https://github.com/maxrave-dev/core.git core
-          git -C core checkout 2bdc10e02013913dc2a465b61979615c8e34a591
+          git -C core checkout 2cb77b8dc37d3dc9982a957304225ebc1d97bfdd
           fi
           test -f core/common/build.gradle.kts
           test -f core/data/build.gradle.kts
