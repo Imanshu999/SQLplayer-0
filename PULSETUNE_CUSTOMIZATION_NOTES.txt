@@ -1,0 +1,10 @@
+PulseTune customization
+
+- Display name changed from SimpMusic to PulseTune.
+- Launcher vector icon refreshed with a dark purple music mark.
+- Material seed color refreshed to purple (#7C4DFF).
+- Promotional blog and kotlin-footguns Home popups removed.
+- The extra login warning popup on Home was removed; actual login screens and backend/data integrations remain.
+- Original open-source license/attribution files are intentionally retained.
+
+Build note: the project still relies on the upstream core submodule; CI should restore maxrave-dev/core before building.
