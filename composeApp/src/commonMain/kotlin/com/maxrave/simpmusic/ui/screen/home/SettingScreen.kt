@@ -2332,7 +2332,7 @@ fun SettingScreen(
                                             .width(
                                                 (fraction.downloadCache * width).dp,
                                             ).background(
-                                                Color(0xD540FF17),
+                                                Color(0xD54A90E2),
                                             ).fillMaxHeight(),
                                 )
                             }
@@ -2354,7 +2354,7 @@ fun SettingScreen(
                                             .width(
                                                 (fraction.canvasCache * width).dp,
                                             ).background(
-                                                Color.Cyan,
+                                                Color(0xFF4A90E2),
                                             ).fillMaxHeight(),
                                 )
                             }
@@ -2417,7 +2417,7 @@ fun SettingScreen(
                                 .size(12.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    Color.Green,
+                                    Color(0xFF4A90E2),
                                 ),
                         )
                         Spacer(Modifier.width(8.dp))
@@ -2447,7 +2447,7 @@ fun SettingScreen(
                                 .size(12.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    Color.Cyan,
+                                    Color(0xFF4A90E2),
                                 ),
                         )
                         Spacer(Modifier.width(8.dp))
