@@ -105,28 +105,11 @@ fun CreditScreen(
             fontSize = 13.sp,
         )
 
-        // Developer - clickable, opens dev blog
+        // Keep this screen neutral: upstream legal attribution remains below,
+        // while personal/portfolio/promotional links are not presented here.
         Text(
-            text = stringResource(Res.string.maxrave_dev),
+            text = "Music player • open-source software",
             style = typo().bodyMedium,
-            textDecoration = TextDecoration.Underline,
-            modifier =
-                Modifier.clickable {
-                    openUrl("https://maxrave.dev")
-                },
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // App description
-        Text(
-            text = stringResource(Res.string.credit_app),
-            style = typo().bodyMedium,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 25.dp),
-            textAlign = TextAlign.Start,
         )
 
         Spacer(modifier = Modifier.height(10.dp))
