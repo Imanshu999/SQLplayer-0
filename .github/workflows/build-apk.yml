@@ -35,6 +35,11 @@ jobs:
           test -f core/common/build.gradle.kts
           test -f core/data/build.gradle.kts
 
+      - name: Prepare AboutLibraries config
+        run: |
+          set -e
+          mkdir -p config
+
       - name: Java 21
         uses: actions/setup-java@v5
         with:
