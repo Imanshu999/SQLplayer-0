@@ -1,61 +1,35 @@
-name: Build APK
-on:
-  workflow_dispatch:
-  push:
-    branches: [main, master]
+name: Build Android APK
 
-permissions:
-  contents: read
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+    - name: Repository Checkout
+      uses: actions/checkout@v4
 
-      - name: Restore matching core
-        run: |
-          set -e
-          rm -rf core
-          git clone --filter=blob:none https://github.com/maxrave-dev/core.git core
-          git -C core checkout 2cb77b8dc37d3dc9982a957304225ebc1d97bfdd
-          test -f core/common/build.gradle.kts
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
 
-      - name: Java 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: gradle
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
 
-      - name: Prepare Android SDK
-        shell: bash
-        run: |
-          set -e
-          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          if [ ! -x "$SDKMANAGER" ]; then
-            SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | sort -V | tail -1)"
-          fi
-          yes | "$SDKMANAGER" --licenses >/dev/null || true
-          "$SDKMANAGER" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
 
-      - name: Prepare required config
-        run: mkdir -p config
-
-      - name: Build
-        run: |
-          set -e
-          chmod +x ./gradlew
-          ./gradlew :androidApp:assembleRelease --no-daemon --stacktrace --no-configuration-cache
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: SQLplayer-APK
-          path: androidApp/build/outputs/apk/**/*.apk
-          if-no-files-found: error
-          retention-days: 14
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: |
+          app/build/outputs/apk/debug/*.apk
+          **/build/outputs/apk/debug/*.apk
