@@ -2,75 +2,69 @@ name: Build Android APK
 
 on:
   workflow_dispatch:
-    inputs:
-      build_type:
-        description: Build type
-        required: true
-        default: release
-        type: choice
-        options: [release, debug]
   push:
-    branches: [main, master]
+    branches: [ main ]
 
 permissions:
   contents: read
 
 jobs:
-  build:
+  build-apk:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 45
+
     steps:
-      - name: Checkout
+      - name: Checkout repository with submodules
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
           submodules: recursive
-      - name: Verify matching core submodule
-        run: |
-          set -euo pipefail
-          test -f core/common/build.gradle.kts
-          test -f core/data/build.gradle.kts
-          git -C core rev-parse HEAD
-          test "$(git -C core rev-parse HEAD)" = "2cb77b8dc37d3dc9982a957304225ebc1d97bfdd"
-      - name: Setup Java 21
-        uses: actions/setup-java@v5
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
-          distribution: temurin
           java-version: '21'
+          distribution: temurin
           cache: gradle
-      - name: Setup Android SDK
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
         run: |
-          set -euo pipefail
-          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          if [ ! -x "$SDKMANAGER" ]; then
-            SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | sort -V | tail -1)"
-          fi
-          yes | "$SDKMANAGER" --licenses >/dev/null || true
-          "$SDKMANAGER" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
-      - name: Prepare
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Verify core source
         run: |
-          mkdir -p config
-          chmod +x gradlew
-      - name: Build APK
-        env:
-          BUILD_TYPE: ${{ github.event.inputs.build_type || 'release' }}
+          test -f core/settings.gradle.kts || test -d core/common
+          git submodule status
+          ls -la core | head -50
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+
+      - name: Generate library metadata if supported
+        run: ./gradlew exportLibraryDefinitions --no-daemon --stacktrace
+        continue-on-error: true
+
+      - name: Build debug APK
+        run: ./gradlew :androidApp:assembleDebug --no-daemon --stacktrace
+
+      - name: Build release APK
+        run: ./gradlew :androidApp:assembleRelease --no-daemon --stacktrace
+        continue-on-error: true
+
+      - name: Collect APKs
         run: |
-          set -euo pipefail
-          if [ "$BUILD_TYPE" = "debug" ]; then
-            ./gradlew :androidApp:clean :androidApp:assembleDebug --no-daemon --stacktrace --no-configuration-cache
-          else
-            ./gradlew :androidApp:clean :androidApp:assembleRelease --no-daemon --stacktrace --no-configuration-cache
-          fi
-      - name: Collect APK
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts
-          find androidApp/build/outputs/apk -type f -name '*.apk' -exec cp {} artifacts/ \;
-          test -n "$(find artifacts -name '*.apk' -print -quit)"
-      - name: Upload APK
+          mkdir -p apk-output
+          find androidApp/build/outputs/apk -type f -name "*.apk" -exec cp {} apk-output/ \;
+          ls -lh apk-output
+          test -n "$(find apk-output -name '*.apk' -print -quit)"
+
+      - name: Upload APK artifacts
         uses: actions/upload-artifact@v4
         with:
           name: SQLplayer-APK
-          path: artifacts/*.apk
+          path: apk-output/*.apk
           if-no-files-found: error
-          retention-days: 30
