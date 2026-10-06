@@ -30,7 +30,8 @@ jobs:
           set -e
           if [ ! -f core/common/build.gradle.kts ]; then
             rm -rf core
-            git clone --depth 1 --branch multiplatform https://github.com/maxrave-dev/core.git core
+            git clone --filter=blob:none https://github.com/maxrave-dev/core.git core
+          git -C core checkout 0b9ce7b71a8b0e7b5d275351fa1e30611e59683e
           fi
           test -f core/common/build.gradle.kts
           test -f core/data/build.gradle.kts
