@@ -37,9 +37,7 @@ val mediaDir = File(rootDir, "core/media")
 rootProject.name = "SimpMusic"
 include(
     ":androidApp",
-    ":vivoAndroidApp",
     ":composeApp",
-    ":desktopApp",
     ":common",
     ":data",
     ":domain",
@@ -87,3 +85,12 @@ project(":media3").projectDir = File(mediaDir, "media3")
 project(":media3-ui").projectDir = File(mediaDir, "media3-ui")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+// Optional platform modules are included only when their source directories exist.
+// This keeps the Android APK build self-contained when Vivo/Desktop sources are not shipped.
+if (File(rootDir, "vivoAndroidApp").isDirectory()) {
+    include(":vivoAndroidApp")
+}
+if (File(rootDir, "desktopApp").isDirectory()) {
+    include(":desktopApp")
+}
