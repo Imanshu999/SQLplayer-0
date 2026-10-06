@@ -8,12 +8,9 @@ on:
         required: true
         default: release
         type: choice
-        options:
-          - release
-          - debug
+        options: [release, debug]
   push:
-    branches:
-      - main
+    branches: [main, master]
 
 permissions:
   contents: read
@@ -22,75 +19,54 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 90
-
     steps:
-      - name: Checkout project
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-
-      - name: Restore matching core module
-        shell: bash
+      - name: Restore core
         run: |
           set -euo pipefail
-          if [ ! -f core/common/build.gradle.kts ]; then
-            rm -rf core
-            git clone --filter=blob:none https://github.com/maxrave-dev/core.git core
-          fi
-          # Agar aapko kisi specific commit ki jagah latest main branch chahiye toh yeh use karein:
-          git -C core checkout main || true
+          rm -rf core
+          git clone --depth 1 --branch main https://github.com/maxrave-dev/core.git core
           test -f core/common/build.gradle.kts
           test -f core/data/build.gradle.kts
-
-      - name: Prepare required directories
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p config
-          chmod +x ./gradlew
-
-      - name: Set up Java 21
+      - name: Setup Java 21
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
           cache: gradle
-
-      - name: Prepare Android SDK
-        shell: bash
+      - name: Setup Android SDK
         run: |
           set -euo pipefail
           SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
           if [ ! -x "$SDKMANAGER" ]; then
             SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | sort -V | tail -1)"
           fi
-          echo "Using: $SDKMANAGER"
           yes | "$SDKMANAGER" --licenses >/dev/null || true
           "$SDKMANAGER" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-
-      - name: Build APK workflow
-        shell: bash
+      - name: Prepare
+        run: |
+          mkdir -p config
+          chmod +x gradlew
+      - name: Build APK
         env:
           BUILD_TYPE: ${{ github.event.inputs.build_type || 'release' }}
         run: |
           set -euo pipefail
           if [ "$BUILD_TYPE" = "debug" ]; then
-            ./gradlew :androidApp:assembleDebug --no-daemon --stacktrace --no-configuration-cache
+            ./gradlew :androidApp:clean :androidApp:assembleDebug --no-daemon --stacktrace --no-configuration-cache
           else
-            ./gradlew :androidApp:assembleRelease --no-daemon --stacktrace --no-configuration-cache
+            ./gradlew :androidApp:clean :androidApp:assembleRelease --no-daemon --stacktrace --no-configuration-cache
           fi
-
       - name: Collect APK
-        shell: bash
         run: |
           set -euo pipefail
-          rm -rf artifacts
           mkdir -p artifacts
-          find androidApp/build/outputs/apk -type f -name '*.apk' -print -exec cp {} artifacts/ \;
-          test -n "$(find artifacts -type f -name '*.apk' -print -quit)"
-          ls -lh artifacts
-
-      - name: Upload APK artifact
+          find androidApp/build/outputs/apk -type f -name '*.apk' -exec cp {} artifacts/ \;
+          test -n "$(find artifacts -name '*.apk' -print -quit)"
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: SQLplayer-APK
