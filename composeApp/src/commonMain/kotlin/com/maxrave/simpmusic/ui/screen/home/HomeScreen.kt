@@ -242,7 +242,7 @@ fun HomeScreen(
     val homeListState by viewModel.homeListState.collectAsStateWithLifecycle()
     val continuation by viewModel.continuation.collectAsStateWithLifecycle()
 
-val openAppTime by sharedViewModel.openAppTime.collectAsStateWithLifecycle()
+    val openAppTime by sharedViewModel.openAppTime.collectAsStateWithLifecycle()
     val shareLyricsPermissions by sharedViewModel.shareSavedLyrics.collectAsStateWithLifecycle()
 
     val backgroundColor = MaterialTheme.colorScheme.background
@@ -291,10 +291,6 @@ val openAppTime by sharedViewModel.openAppTime.collectAsStateWithLifecycle()
     var showRequestShareLyricsPermissions by rememberSaveable {
         mutableStateOf(false)
     }
-var showFootgunsDialog by rememberSaveable {
-        mutableStateOf(false)
-    }
-
     var topAppBarHeightPx by rememberSaveable {
         mutableIntStateOf(0)
     }
