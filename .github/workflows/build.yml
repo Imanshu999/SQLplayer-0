@@ -32,7 +32,6 @@ jobs:
           test -f core/data/build.gradle.kts
           git -C core rev-parse HEAD
           test "$(git -C core rev-parse HEAD)" = "2cb77b8dc37d3dc9982a957304225ebc1d97bfdd"
-          test "$(git -C core rev-parse HEAD)" = "2cb77b8dc37d3dc9982a957304225ebc1d97bfdd"
       - name: Setup Java 21
         uses: actions/setup-java@v5
         with:
