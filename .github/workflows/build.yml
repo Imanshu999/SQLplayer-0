@@ -22,7 +22,7 @@ jobs:
           set -e
           rm -rf core
           git clone --filter=blob:none https://github.com/maxrave-dev/core.git core
-          git -C core checkout 0b9ce7b71a8b0e7b5d275351fa1e30611e59683e
+          git -C core checkout 2bdc10e02013913dc2a465b61979615c8e34a591
           test -f core/common/build.gradle.kts
 
       - name: Java 21
